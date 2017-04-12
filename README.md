@@ -1,6 +1,6 @@
 # telemetry
 
-A java.lang.instrument agent
+A java.lang.instrument agent for collection of runtime data.
 
 ## Usage
 
