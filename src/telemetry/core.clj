@@ -1,12 +1,12 @@
 (ns telemetry.core
   (:gen-class :prefix "-"
               :methods [^{:static true}
-                        [premain [String java.lang.instrument.Instrumentation] void]]
+  [premain [String java.lang.instrument.Instrumentation] void]]
               :name telemetry.core.TelemetryAgent)
-  (:import (java.lang.instrument Instrumentation ClassFileTransformer)))
-
-(defn foo[]
-  (println "foo invoked"))
+  (:require [telemetry.intercept])
+  (:import (java.lang.instrument Instrumentation ClassFileTransformer)
+           (telemetry.interceptor GeneralInterceptor)
+           (telemetry.intercept GenInt)))
 
 (defn class-transformer []
   (reify ClassFileTransformer
@@ -14,13 +14,21 @@
       (println (str "Class: " className))
       classfileBuffer)))
 
+(defn setup-bbuddy [instr]
+  )
+
+(comment
+  (defn -premain
+    "Invoked by JVM instrumentation agent machinery"
+    [^String args ^Instrumentation instr]
+    (println "premain invoked")
+    (.addTransformer instr (class-transformer))))
+
 (defn -premain
   "Invoked by JVM instrumentation agent machinery"
   [^String args ^Instrumentation instr]
   (println "premain invoked")
-  (.addTransformer instr (class-transformer))
-  (foo))
-
+  (GeneralInterceptor/configAgent instr GenInt))
 
 (defn -main
   ""
